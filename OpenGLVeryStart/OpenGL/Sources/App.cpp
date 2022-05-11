@@ -52,7 +52,10 @@ void App::Init(AppInitializer initializer)
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
 
-	Model model("OpenGL/Resources/Obj/cube.obj");
+	Model model;
+	model.setResourcePath("Resources/Obj/cube.obj");
+	model.loadResource();
+	model.printResource();
 }
 
 void App::Update(int shaderProgram, unsigned int VAO)

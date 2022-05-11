@@ -49,6 +49,11 @@ void Log::Print(const char* format, ...)
 				char i = va_arg(args, char);
 				std::cout << static_cast<char>(i);
 			}
+			else if (*format == 's')
+			{
+				string i = va_arg(args, string);
+				std::cout << static_cast<string>(i);
+			}
 			else
 			{
 				std::cout << *format;

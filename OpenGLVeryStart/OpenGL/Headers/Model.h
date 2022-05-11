@@ -26,14 +26,20 @@ namespace Resources
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indexes;
 
-		void loadSource(const std::string& path) ;
-		void unloadSource() ;
+		void loadResource();
+		void unloadResource();
+		void printResource();
 
+		/*
 		Model(const std::string& path)
 		{
 			resourcePath = path;
 		}
+		*/
 
-		~Model() {};
+		~Model() 
+		{
+
+		}
 	};
 }

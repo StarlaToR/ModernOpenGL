@@ -2,16 +2,16 @@
 using namespace Resources;
 using namespace std;
 
-void Model::loadSource(const std::string& path)
+void Model::loadResource()
 {
 	Core::Debug::Log log;
 	ifstream file;
 
-	file.open(path);
+	file.open(resourcePath);
 
 	ASSERT(file.is_open(), "Can't open file");
 
-    log.Print("%s is open\n", path);
+    log.Print("%s is open\n", resourcePath);
 
     vector<unsigned int> vertexIndices, normalIndices, uvIndices;
 
@@ -87,11 +87,34 @@ void Model::loadSource(const std::string& path)
         vertices[i].TextureUV = temp_uvs[uvIndices[i] - 1];
         vertices[i].Normal = temp_normals[normalIndices[i] - 1];
     }
-    log.Print("%s is loaded\n", path);
+
+    log.Print("%s is loaded\n", resourcePath);
+
+    file.close();
 }
 
-void Model::unloadSource()
+void Model::unloadResource()
 {
 	vertices.clear();
 	indexes.clear();
+}
+
+void Model::printResource()
+{
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        Vertex vertex = vertices[i];
+        printf("Vertex %d :\n", i + 1);
+
+        //Position
+        printf(" Position : { %f, %f, %f }\n", vertex.Position.x, vertex.Position.y, vertex.Position.z);
+
+        //UV
+        printf(" UV : { %f, %f }\n", vertex.TextureUV.x, vertex.TextureUV.y);
+
+        //Normal
+        printf(" Normal: { %f, %f, %f }\n", vertex.Normal.x, vertex.Normal.y, vertex.Normal.z);
+
+        printf("\n\n");
+    }
 }
