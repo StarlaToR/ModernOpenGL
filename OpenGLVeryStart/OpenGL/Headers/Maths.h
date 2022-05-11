@@ -221,6 +221,9 @@ public:
 Mat4 operator*(const Mat4& a, const Mat4& b);
 Mat4 operator*(const Mat4& a, const float b);
 
+Mat3 operator*(const Mat3& a, const Mat3& b);
+Mat3 operator*(const Mat3& a, const float b);
+
 Vec4 operator+(const Vec4& a, const Vec4& b);
 Vec4 operator*(const Vec4& a, const float b);
 Vec4 operator*(const Vec4& b, const Mat4& a);
@@ -370,6 +373,7 @@ inline float GetDotProduct(const Vec3& a, const Vec3& b)
 
 float GetDeterminantMat2(const float a, const float b, const float c, const float d);
 float GetDeterminantMat3(const Vec3& a, const Vec3& b, const Vec3& c);
+float GetDeterminantMat3(const float tab[3][3]);
 float GetDeterminantMat4(const Mat4& a);
 
 float GetMaximumDifference(const float a, const float b, const float c);

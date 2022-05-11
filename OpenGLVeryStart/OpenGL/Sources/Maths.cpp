@@ -300,7 +300,49 @@ Mat3 Mat3::GetAdjugateMat3()
 
 Mat3 Mat3::GetInvertibleMat3()
 {
-    return (this->GetAdjugateMat3() * (1 / GetDeterminantMat3(*this)));
+    return (this->GetAdjugateMat3().GetTransposeMat3() * (1 / GetDeterminantMat3(this->tab)));
+}
+
+void Mat3::operator=(const Mat3& a)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            this->tab[i][j] = a.tab[i][j];
+        }
+    }
+}
+
+
+void Mat3::operator*=(const Mat3& a)
+{
+    Mat3 c = Mat3();
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            for (int k = 0; k < 3; k++)
+            {
+                c.tab[i][j] += this->tab[i][k] * a.tab[k][j];
+            }
+        }
+    }
+
+    *this = c;
+}
+
+//Working
+void Mat3::operator*=(const float a)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            this->tab[i][j] *= a;
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -423,7 +465,7 @@ Mat4 Mat4::GetAdjugateMat4()
 
 Mat4 Mat4::GetInvertibleMat4()
 {
-    return (this->GetAdjugateMat4() * (1 / GetDeterminantMat4(*this)));
+    return (this->GetAdjugateMat4().GetTransposeMat4() * (1 / GetDeterminantMat4(*this)));
 }
 
 
@@ -438,6 +480,15 @@ float GetDeterminantMat3(const Vec3& a, const Vec3& b, const Vec3& c)
         a.x * GetDeterminantMat2(b.y, b.z, c.y, c.z)
         - a.y * GetDeterminantMat2(b.x, b.z, c.x, c.z)
         + a.z * GetDeterminantMat2(b.x, b.y, c.x, c.y)
+        );
+}
+
+float GetDeterminantMat3(const float tab[3][3])
+{
+    return (
+        tab[0][0] * GetDeterminantMat2(tab[1][1], tab[1][2], tab[2][1], tab[2][2])
+        - tab[0][1] * GetDeterminantMat2(tab[1][0], tab[1][2], tab[2][0], tab[2][2])
+        + tab[0][2] * GetDeterminantMat2(tab[1][0], tab[1][1], tab[2][0], tab[2][1])
         );
 }
 
@@ -496,6 +547,9 @@ void Mat4::operator*=(const float a)
     }
 }
 
+///////////////////////////////////                       Mat4                       /////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Mat4 operator*(const Mat4& a, const Mat4& b)
 {
     Mat4 c = Mat4();
@@ -530,8 +584,38 @@ Mat4 operator*(const Mat4& a, const float b)
     return c;
 }
 
-///////////////////////////////////                       Mat4                       /////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Mat3 operator*(const Mat3& a, const Mat3& b)
+{
+    Mat3 c = Mat3();
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            for (int k = 0; k < 3; k++)
+            {
+                c.tab[i][j] += a.tab[i][k] * b.tab[k][j];
+            }
+        }
+    }
+
+    return c;
+}
+
+Mat3 operator*(const Mat3& a, const float b)
+{
+    Mat3 c = Mat3();
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            c.tab[i][j] = a.tab[i][j] * b;
+        }
+    }
+
+    return c;
+}
 
 
 Vec4 operator*(const Mat4& a, const Vec4& b)

@@ -1,6 +1,5 @@
+#include <windows.h>
 #include <Log.h>
-#include <cstdarg>
-#include <iostream>
 
 using namespace Core::Debug;
 

@@ -1,6 +1,7 @@
 #include <App.h>;
 
 using namespace Core;
+using namespace Resources;
 
 App::~App()
 {
@@ -50,6 +51,8 @@ void App::Init(AppInitializer initializer)
 		glDebugMessageCallback(initializer.glDebugOutput, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
+
+	Model model("OpenGL/Resources/Obj/cube.obj");
 }
 
 void App::Update(int shaderProgram, unsigned int VAO)

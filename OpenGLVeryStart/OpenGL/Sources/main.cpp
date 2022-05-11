@@ -11,18 +11,7 @@
 
 using namespace Core;
 using namespace Debug;
-
-#ifdef DEBUG:
-#define Assert(bool cond)
-{
-	
-}
-#else:
-#define Assert(bool)
-{
-	
-}
-#endif
+using namespace Resources;
 
 
 
@@ -109,7 +98,6 @@ int main()
 
 	App app;
 	app.Init(initializer);
-
 
 	// build and compile our shader program
 	// ------------------------------------

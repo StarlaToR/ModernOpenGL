@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <ResourceManager.h>
+#include <Model.h>
 
 namespace Core
 {
