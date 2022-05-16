@@ -55,6 +55,14 @@ void App::Init(AppInitializer initializer)
 
 void App::Update(int shaderProgram, unsigned int VAO)
 {
+	Mat4 trans = GetIdentityMat4();
+
+	trans.Scale(Vec3(0.5f, 0.5f, 0.5f));
+
+	trans.Rotate(Vec3(0, (float)glfwGetTime(), (float)glfwGetTime()));
+
+	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *trans.tab);
 	// input
 		// -----
 	glfwPollEvents();

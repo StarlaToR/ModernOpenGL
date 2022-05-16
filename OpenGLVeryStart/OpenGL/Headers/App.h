@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ResourceManager.h>
 #include <Model.h>
+#include <Maths.h>
 
 namespace Core
 {

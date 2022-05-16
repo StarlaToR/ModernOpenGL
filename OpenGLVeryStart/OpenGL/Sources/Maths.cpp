@@ -357,24 +357,36 @@ void Mat4::Translate(const Vec3& translation)
     this->tab[1][3] += translation.y;
     this->tab[2][3] += translation.z;
 
-    printf("\n\n\nAFTER:\n");
+    printf("\nAFTER:\n");
     PrintMatrix();
     printf("\n\n\n\n");
 }
 
-void Mat4::Rotate(const float angle, const Vec3& rotationAxis)
+void Mat4::Rotate(const Vec3& rotation)
 {
     printf("BEFORE:\n");
     PrintMatrix();
 
-    if (rotationAxis.x == 1)
-        CreateXRotationMatrix(angle);
-    if (rotationAxis.y == 1)
-        CreateYRotationMatrix(angle);
-    if (rotationAxis.z == 1)
-        CreateZRotationMatrix(angle);
+    if (rotation.y != 0)
+        *this *= CreateYRotationMatrix(rotation.y);
+    if (rotation.x != 0)
+       *this *= CreateXRotationMatrix(rotation.x);
+    if (rotation.z != 0)
+       *this *= CreateZRotationMatrix(rotation.z);
 
-    printf("\nZnAFTER:\n");
+    printf("\nAFTER:\n");
+    PrintMatrix();
+    printf("\n\n");
+}
+
+void Mat4::Scale(const Vec3& scale)
+{
+    printf("BEFORE:\n");
+    PrintMatrix();
+
+    *this *= CreateScaleMatrix(scale);
+
+    printf("\nAFTER:\n");
     PrintMatrix();
     printf("\n\n");
 }

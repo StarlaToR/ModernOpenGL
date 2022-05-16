@@ -30,13 +30,6 @@ namespace Resources
 		void unloadResource();
 		void printResource();
 
-		/*
-		Model(const std::string& path)
-		{
-			resourcePath = path;
-		}
-		*/
-
 		~Model() 
 		{
 

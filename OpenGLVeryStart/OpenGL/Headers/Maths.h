@@ -139,7 +139,8 @@ public:
 
 
     void Translate(const Vec3& translation);
-    void Rotate(const float angle, const Vec3& rotationAxis);
+    void Rotate(const Vec3& rotation);
+    void Scale(const Vec3& scale);
 
     void PrintMatrix();
     Mat4 GetTransposeMat4();
