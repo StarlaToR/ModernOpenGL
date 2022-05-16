@@ -8,6 +8,7 @@
 #include <iostream>
 #include <App.h>
 #include <Log.h>
+#include <Shader.h>
 
 using namespace Core;
 using namespace Debug;
@@ -64,34 +65,6 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout(location = 0) in vec3 aPos;"
-"layout(location = 1) in vec3 aColor;"
-"layout(location = 2) in vec2 aTexCoord;"
-
-"out vec3 ourColor;"
-"out vec2 TexCoord;"
-
-"void main()"
-"{"
-"	gl_Position = vec4(aPos, 1.0);"
-"	ourColor = aColor;"
-"	TexCoord = aTexCoord;"
-"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;"
-
-"in vec3 ourColor;"
-"in vec2 TexCoord;"
-"uniform sampler2D texture1;"
-"uniform sampler2D texture2;"
-"void main()"
-"{"
-"	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);"
-"}\0";
-
-
 int main()
 {
 	AppInitializer initializer = { 800 , 600, 4, 5, "ChatChien", framebuffer_size_callback, glDebugOutput };
@@ -99,59 +72,22 @@ int main()
 	App app;
 	app.Init(initializer);
 
+	ResourceManager manager;
+	Model* model = manager.Create<Model>("Resources/Obj/cube.obj", "cube");
+
+	if (model == nullptr)
+	{
+		cout << "resource not found" << endl;
+	}
+
 	// build and compile our shader program
 	// ------------------------------------
-	// vertex shader
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// link shaders
-	int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	
+	Shader shader("Resources/Shaders/VertexShader.glsl", "Resources/Shaders/FragmentShader.glsl");
+
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
-	};
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
 
 	unsigned int VBO, VAO, EBO;
 
@@ -166,12 +102,14 @@ int main()
 
 	//glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * model->vertices.size(), model->vertices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * model->indexes.size(), model->indexes.data(), GL_STATIC_DRAW);
 
 	// position attribute
+
+	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
@@ -180,7 +118,7 @@ int main()
 	// texture coord attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
+	
 
 	// generate the texture data
 	// ------------------------------------
@@ -236,7 +174,7 @@ int main()
 	// -----------
 	while (!glfwWindowShouldClose(app.window))
 	{
-		app.Update(shaderProgram, VAO);
+		app.Update(shader.shaderProgram, VAO);
 	}
 
 

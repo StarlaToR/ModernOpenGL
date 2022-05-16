@@ -51,11 +51,6 @@ void App::Init(AppInitializer initializer)
 		glDebugMessageCallback(initializer.glDebugOutput, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
-
-	Model model;
-	model.setResourcePath("Resources/Obj/cube.obj");
-	model.loadResource();
-	model.printResource();
 }
 
 void App::Update(int shaderProgram, unsigned int VAO)
@@ -67,7 +62,7 @@ void App::Update(int shaderProgram, unsigned int VAO)
 
 	// render
 	// ------
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.f, 0.f, 0.7f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//glBindTexture(GL_TEXTURE_2D, texture);
@@ -81,7 +76,7 @@ void App::Update(int shaderProgram, unsigned int VAO)
 
 	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	// glBindVertexArray(0); // no need to unbind it every time
 

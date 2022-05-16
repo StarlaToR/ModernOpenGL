@@ -88,6 +88,12 @@ void Model::loadResource()
         vertices[i].Normal = temp_normals[normalIndices[i] - 1];
     }
 
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        indexes.push_back(i);
+        cout << i << endl;
+    }
+
     log.Print("%s is loaded\n", resourcePath);
 
     file.close();
