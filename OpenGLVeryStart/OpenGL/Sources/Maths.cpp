@@ -16,6 +16,14 @@ void Vec3::Normalize()
     z /= GetMagnitude();
 }
 
+Vec3 Vec3::GetNormalizedVector()
+{
+    return (Vec3(x / GetMagnitude(),
+        y / GetMagnitude(),
+        z / GetMagnitude()));
+}
+
+
 float edgeFunction(const Vec3& a, const Vec3& b, const Vec3& c)
 {
     return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
@@ -50,6 +58,20 @@ bool Vec3::operator==(const Vec3& a)
         return true;
 
     return false;
+}
+
+void Vec3::operator+=(const Vec3& a)
+{
+    this->x += a.x;
+    this->y += a.y;
+    this->z += a.z;
+}
+
+void Vec3::operator-=(const Vec3& a)
+{
+    this->x -= a.x;
+    this->y -= a.y;
+    this->z -= a.z;
 }
 
 Vec3 operator+(const Vec3& a, const Vec3& b)
@@ -350,45 +372,56 @@ void Mat3::operator*=(const float a)
 
 void Mat4::Translate(const Vec3& translation)
 {
+    /*
     printf("BEFORE:\n");
-    PrintMatrix();
+    PrintMatrix();\
+    */
 
     this->tab[0][3] += translation.x;
     this->tab[1][3] += translation.y;
     this->tab[2][3] += translation.z;
-
+    /*
     printf("\nAFTER:\n");
     PrintMatrix();
     printf("\n\n\n\n");
+    */
 }
 
 void Mat4::Rotate(const Vec3& rotation)
 {
+    /*
     printf("BEFORE:\n");
-    PrintMatrix();
+    PrintMatrix();\
+    */
 
     if (rotation.y != 0)
-        *this *= CreateYRotationMatrix(rotation.y);
+       *this *= CreateYRotationMatrix(rotation.y);
     if (rotation.x != 0)
        *this *= CreateXRotationMatrix(rotation.x);
     if (rotation.z != 0)
        *this *= CreateZRotationMatrix(rotation.z);
 
+    /*
     printf("\nAFTER:\n");
     PrintMatrix();
-    printf("\n\n");
+    printf("\n\n\n\n");
+    */
 }
 
 void Mat4::Scale(const Vec3& scale)
 {
+    /*
     printf("BEFORE:\n");
-    PrintMatrix();
+    PrintMatrix();\
+    */
 
     *this *= CreateScaleMatrix(scale);
 
+    /*
     printf("\nAFTER:\n");
     PrintMatrix();
-    printf("\n\n");
+    printf("\n\n\n\n");
+    */
 }
 
 Mat4::Mat4(const float a[4][4])

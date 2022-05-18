@@ -9,10 +9,12 @@
 #include <App.h>
 #include <Log.h>
 #include <Shader.h>
+#include <Camera.h>
 
 using namespace Core;
 using namespace Debug;
 using namespace Resources;
+using namespace LowRenderer;
 
 
 
@@ -85,7 +87,6 @@ int main()
 	
 	Shader shader("Resources/Shaders/VertexShader.glsl", "Resources/Shaders/FragmentShader.glsl");
 
-
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -108,8 +109,6 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * model->indexes.size(), model->indexes.data(), GL_STATIC_DRAW);
 
 	// position attribute
-
-	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute

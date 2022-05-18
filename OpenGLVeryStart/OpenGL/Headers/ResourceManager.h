@@ -26,7 +26,7 @@ namespace Resources
 			resource->setResourceId(mResources.size());
 			resource->loadResource();
 
-			mResources.insert(pair<string, IResource*>(path, (IResource*)resource));
+			mResources.insert(pair<string, IResource*>(name, (IResource*)resource));
 
 			return resource;
 		}

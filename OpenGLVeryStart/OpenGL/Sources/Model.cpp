@@ -91,11 +91,11 @@ void Model::loadResource()
     for (int i = 0; i < vertices.size(); i++)
     {
         indexes.push_back(i);
-        cout << i << endl;
+        //cout << i << endl;
     }
 
     log.Print("%s is loaded\n", resourcePath);
-
+    printResource();
     file.close();
 }
 

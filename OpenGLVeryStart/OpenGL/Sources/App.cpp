@@ -51,31 +51,36 @@ void App::Init(AppInitializer initializer)
 		glDebugMessageCallback(initializer.glDebugOutput, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 void App::Update(int shaderProgram, unsigned int VAO)
 {
-	Mat4 trans = GetIdentityMat4();
+	cam.Update();
 
-	trans.Scale(Vec3(0.5f, 0.5f, 0.5f));
+	Mat4 modelMatrix = GetIdentityMat4();
 
-	trans.Rotate(Vec3(0, (float)glfwGetTime(), (float)glfwGetTime()));
+	modelMatrix.Scale(Vec3(0.5f, 0.5f, 0.5f));
+	modelMatrix.Translate(Vec3(0, 0, 0));
+	modelMatrix.Rotate(Vec3(0, (float)glfwGetTime(), (float)glfwGetTime()));
+
+	Mat4 transformMatrix = cam.GetProjectionMatrix() * cam.GetViewMatrix() * modelMatrix;
 
 	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *trans.tab);
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *transformMatrix.tab);
+
 	// input
 		// -----
 	glfwPollEvents();
-	processInput(window);
+	processInput();
 
 	// render
 	// ------
 	glClearColor(0.f, 0.f, 0.7f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-
+	glClear(GL_DEPTH_BUFFER_BIT);
 	//glBindTexture(GL_TEXTURE_2D, texture);
-
-
 
 	// draw our first triangle
 	glUseProgram(shaderProgram);
@@ -95,8 +100,17 @@ void App::Update(int shaderProgram, unsigned int VAO)
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void App::processInput(GLFWwindow* window)
+void App::processInput()
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cam.position -= cam.speed * cam.direction;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cam.position += cam.speed * cam.direction;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cam.position += GetCrossProduct(cam.direction, cam.camUp).GetNormalizedVector() * cam.speed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cam.position -= GetCrossProduct(cam.direction, cam.camUp).GetNormalizedVector() * cam.speed;
 }

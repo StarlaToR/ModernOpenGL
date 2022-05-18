@@ -7,6 +7,7 @@
 #include <ResourceManager.h>
 #include <Model.h>
 #include <Maths.h>
+#include <Camera.h>
 
 namespace Core
 {
@@ -27,14 +28,19 @@ namespace Core
 
 	public:
 		GLFWwindow* window;
-
+		LowRenderer::Camera cam;
 	private:
 
 	public:
+		App()
+		{
+			cam = LowRenderer::Camera();
+		}
+
 		~App();
 
 		void Init(AppInitializer intializer);
 		void Update(int shaderProgram, unsigned int VAO);
-		void processInput(GLFWwindow* window);
+		void processInput();
 	};
 }

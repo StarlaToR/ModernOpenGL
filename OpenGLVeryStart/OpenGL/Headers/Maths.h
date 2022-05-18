@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <vector>
 
+
+#define M_PI 3,14159265
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////                       Vec2                       /////////////////////////////////////////////////////
 
@@ -56,13 +58,15 @@ public:
 
     float GetMagnitude() const;
     void Normalize();
+    Vec3 GetNormalizedVector();
     bool IsInTriangle(const Vec3& p0, const Vec3& p1, const Vec3& p2);
     Vec3 GetBarycentricCoords(const Vec3& p0, const Vec3& p1, const Vec3& p2);
-    float GetCrossProduct(const Vec3& a, const Vec3& b);
 
     void GetNewZForZBuffer();
 
     bool operator==(const Vec3& a);
+    void operator+=(const Vec3& a);
+    void operator-=(const Vec3& a);
 };
 
 
@@ -357,10 +361,9 @@ inline Mat4 CreateTransformMatrix(const Vec3& position, const Vec3& rotation, co
     return transform;
 }
 
-inline float GetCrossProduct(const Vec3& a, const Vec3& b)
+inline Vec3 GetCrossProduct(const Vec3& a, const Vec3& b)
 {
-    Vec3 d = a * b;
-    return d.GetMagnitude();
+    return a * b;
 }
 
 inline float GetDotProduct(const Vec3& a, const Vec3& b)

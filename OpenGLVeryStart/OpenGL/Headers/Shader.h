@@ -29,7 +29,7 @@ namespace Resources
 				std::cout << "Vertex shader not found" << std::endl;
 			if (!SetFragmentShader(fragmentPath))
 				std::cout << "Fragment shader not found" << std::endl;
-			if (Link())
+			if (!Link())
 				std::cout << "Shaders can't be binded" << std::endl;
 		}
 
