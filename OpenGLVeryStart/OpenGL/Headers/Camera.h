@@ -1,5 +1,8 @@
 #pragma once
 #include <Maths.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
+
 
 namespace LowRenderer
 {
@@ -22,14 +25,20 @@ namespace LowRenderer
 		0.f, 0.f, -1.f, 0.f,
 		};	
 
+		bool firstMouse = true;
+		float lastX = 400.f, lastY = 300.f, yaw = -90, pitch = 0;
+
 	public:
-		Vec3 direction;
+		Vec3 direction = Vec3(0,0,0);
 		Vec3 target = Vec3();
 		Vec3 position = Vec3(0, 0, -9);
 		Vec3 rotation;
 		Vec3 camUp;
 		Vec3 camRight = Vec3();
+		Vec3 camForward = Vec3();
 		float speed = 0.05f;
+		float deltaTime = 0.0f;
+		float lastFrame = 0.0f;
 
 		Camera() {}
 		~Camera() {}
@@ -38,6 +47,7 @@ namespace LowRenderer
 		Mat4 GetViewMatrix() { return viewMatrix; };
 		Mat4 GetProjectionMatrix() { return projectionMatrix; };
 		Mat4 LookAt(const Vec3& targ);
-
+		Mat4 LookAt();
+		void MouseDirection(double xpos, double ypos);
 	};
 }

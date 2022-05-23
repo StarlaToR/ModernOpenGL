@@ -5,9 +5,10 @@
 
 #include <iostream>
 #include <ResourceManager.h>
-#include <Model.h>
 #include <Maths.h>
 #include <Camera.h>
+#include <Mesh.h>
+#include <Light.h>
 
 namespace Core
 {
@@ -25,13 +26,13 @@ namespace Core
 	class App
 	{
 	private:
-
+		
 	public:
 		GLFWwindow* window;
 		LowRenderer::Camera cam;
-	private:
+		std::vector<LowRenderer::Mesh*> meshes;
+		std::vector<LowRenderer::Light*> lights;
 
-	public:
 		App()
 		{
 			cam = LowRenderer::Camera();
@@ -40,7 +41,7 @@ namespace Core
 		~App();
 
 		void Init(AppInitializer intializer);
-		void Update(int shaderProgram, unsigned int VAO);
+		void Update(int shaderProgram);
 		void processInput();
 	};
 }

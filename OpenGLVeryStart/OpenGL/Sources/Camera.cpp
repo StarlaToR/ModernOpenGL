@@ -4,24 +4,73 @@ using namespace LowRenderer;
 
 void Camera::Update()
 {
-    direction = (position - target).GetNormalizedVector();
-    camRight = GetCrossProduct(Vec3(0,1,0), direction).GetNormalizedVector();
-    camUp = GetCrossProduct(direction, camRight);
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    speed = deltaTime * 5.f;
 
-    transformMatrix = CreateTransformMatrix(position, rotation, { 1,1,1 });
-    viewMatrix = transformMatrix.GetInvertibleMat4();
+	viewMatrix = LookAt();
 }
 
 Mat4 Camera::LookAt(const Vec3& targ)
 {
-    direction = (position - target).GetNormalizedVector();
-    camRight = GetCrossProduct(Vec3(0, 1, 0), direction).GetNormalizedVector();
-    camUp = GetCrossProduct(direction, camRight);
+    camForward = (position + targ).GetNormalizedVector();
+    camRight = GetCrossProduct(Vec3(0, 1, 0), camForward).GetNormalizedVector();
+    camUp = GetCrossProduct(camForward, camRight);
 
-    Mat4 mat1 = Mat4(camRight.x, camRight.y, camRight.z, 0, camUp.x, camUp.y, camUp.z, 0, direction.x, direction.y, direction.z, 0, 0, 0, 0, 1);
-    Mat4 mat2 = Mat4(1, 0, 0, -position.x, 0, 1, 0, -position.y, 0, 0, 1, -position.z, 0, 0, 0, 1);
+    Mat4 mat = Mat4(camRight.x, camRight.y, camRight.z, -GetDotProduct(camRight, position),
+					camUp.x, camUp.y, camUp.z, -GetDotProduct(camUp, position),
+					camForward.x, camForward.y, camForward.z, -GetDotProduct(camForward, position),
+					0, 0, 0, 1);
 
-    return mat1 * mat2;
+    return mat;
+}
+
+Mat4 Camera::LookAt()
+{
+	camRight = GetCrossProduct(Vec3(0, 1, 0), camForward).GetNormalizedVector();
+	camUp = GetCrossProduct(camForward, camRight);
+
+	Mat4 mat = Mat4(camRight.x, camRight.y, camRight.z, -GetDotProduct(camRight, position),
+		camUp.x, camUp.y, camUp.z, -GetDotProduct(camUp, position),
+		camForward.x, camForward.y, camForward.z, -GetDotProduct(camForward, position),
+		0, 0, 0, 1);
+
+	return mat;
+}
+
+void Camera::MouseDirection(double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+	
+	float sensitivity = 0.2f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	Vec3 dir = {
+		cos(DegToRad(yaw))* cos(DegToRad(pitch)),
+		-sin(DegToRad(pitch)),
+		sin(DegToRad(yaw))* cos(DegToRad(pitch)),
+		};
+	camForward = dir.GetNormalizedVector();
 }
 
 /*

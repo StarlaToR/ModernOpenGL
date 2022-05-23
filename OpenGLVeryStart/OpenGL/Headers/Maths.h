@@ -4,7 +4,8 @@
 #include <vector>
 
 
-#define M_PI 3,14159265
+#define M_PI 3.14159265
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////                       Vec2                       /////////////////////////////////////////////////////
 
@@ -369,6 +370,16 @@ inline Vec3 GetCrossProduct(const Vec3& a, const Vec3& b)
 inline float GetDotProduct(const Vec3& a, const Vec3& b)
 {
     return (a.x * b.x + a.y * b.y + a.z * b.z);
+}
+
+inline float DegToRad(float a)
+{
+    return a * M_PI / 180;
+}
+
+inline float RadToDeg(float a)
+{
+    return a * 180 / M_PI;
 }
 
 /////////////////////////////////////////////           Inline functions            /////////////////////////////////////////////////////

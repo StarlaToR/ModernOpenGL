@@ -53,23 +53,12 @@ void App::Init(AppInitializer initializer)
 	}
 
 	glEnable(GL_DEPTH_TEST);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void App::Update(int shaderProgram, unsigned int VAO)
+void App::Update(int shaderProgram)
 {
-	cam.Update();
-
-	Mat4 modelMatrix = GetIdentityMat4();
-
-	modelMatrix.Scale(Vec3(0.5f, 0.5f, 0.5f));
-	modelMatrix.Translate(Vec3(0, 0, 0));
-	modelMatrix.Rotate(Vec3(0, (float)glfwGetTime(), (float)glfwGetTime()));
-
-	Mat4 transformMatrix = cam.GetProjectionMatrix() * cam.GetViewMatrix() * modelMatrix;
-
-	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *transformMatrix.tab);
-
 	// input
 		// -----
 	glfwPollEvents();
@@ -82,16 +71,20 @@ void App::Update(int shaderProgram, unsigned int VAO)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//glBindTexture(GL_TEXTURE_2D, texture);
 
-	// draw our first triangle
-	glUseProgram(shaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0); // set it manually
-	glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1); // set it manually
+	cam.Update();
+	Mat4 projView = cam.GetProjectionMatrix() * cam.GetViewMatrix();
+	
+	glUniform3f(glGetUniformLocation(shaderProgram, "ambientColor"), lights[0]->ambientColor.x, lights[0]->ambientColor.y, lights[0]->ambientColor.z);
+	glUniform3f(glGetUniformLocation(shaderProgram, "diffuseColor"), lights[0]->diffuseColor.x, lights[0]->diffuseColor.y, lights[0]->diffuseColor.z);
+	glUniform3f(glGetUniformLocation(shaderProgram, "specularColor"), lights[0]->specularColor.x, lights[0]->specularColor.y, lights[0]->specularColor.z);
+	glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lights[0]->position.x, lights[0]->position.y, lights[0]->position.z);
+	//glUniform1i(glGetUniformLocation(shaderProgram, "lightType"), lights[0]->type);
+	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), cam.position.x, cam.position.y, cam.position.z);
 
-	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-	// glBindVertexArray(0); // no need to unbind it every time
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		meshes[i]->Update(projView, shaderProgram);
+	}
 
 	// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 	// -------------------------------------------------------------------------------
@@ -106,11 +99,22 @@ void App::processInput()
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cam.position -= cam.speed * cam.direction;
+		cam.position -= cam.speed * cam.camForward;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cam.position += cam.speed * cam.direction;
+		cam.position += cam.speed * cam.camForward;
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cam.position += GetCrossProduct(cam.direction, cam.camUp).GetNormalizedVector() * cam.speed;
+		cam.position -= cam.camRight * cam.speed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cam.position -= GetCrossProduct(cam.direction, cam.camUp).GetNormalizedVector() * cam.speed;
+		cam.position += cam.camRight * cam.speed;
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		cam.position += cam.camUp * cam.speed;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		cam.position -= cam.camUp * cam.speed;
+
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	cam.MouseDirection(xpos, ypos);
+	//cout << "xpos : " << xpos << ", ypos : " << ypos << endl;
 }
