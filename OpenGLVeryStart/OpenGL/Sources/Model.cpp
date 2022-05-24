@@ -95,7 +95,7 @@ void Model::loadResource()
     }
 
     log.Print("%s is loaded\n", resourcePath);
-    printResource();
+    //printResource();
     file.close();
 }
 

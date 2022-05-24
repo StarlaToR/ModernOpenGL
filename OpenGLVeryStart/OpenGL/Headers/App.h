@@ -9,6 +9,8 @@
 #include <Camera.h>
 #include <Mesh.h>
 #include <Light.h>
+#include <Log.h>
+#include <sstream>
 
 namespace Core
 {
@@ -31,7 +33,9 @@ namespace Core
 		GLFWwindow* window;
 		LowRenderer::Camera cam;
 		std::vector<LowRenderer::Mesh*> meshes;
-		std::vector<LowRenderer::Light*> lights;
+		std::vector<LowRenderer::PointLight*> pointLights;
+		std::vector<LowRenderer::DirectionnalLight*> directLights;
+		std::vector<LowRenderer::SpotLight*> spotLights;
 
 		App()
 		{
@@ -41,7 +45,10 @@ namespace Core
 		~App();
 
 		void Init(AppInitializer intializer);
-		void Update(int shaderProgram);
+		void Update(unsigned int shaderProgram);
+		void PointLightsToShaders(unsigned int shaderProgram);
+		void DirectLightsToShaders(unsigned int shaderProgram);
+		void SpotLightsToShaders(unsigned int shaderProgram);
 		void processInput();
 	};
 }

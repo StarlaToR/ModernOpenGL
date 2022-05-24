@@ -2,10 +2,11 @@
 
 using namespace LowRenderer;
 
-Mesh::Mesh(Model* mod, const Mat4& mat)
+Mesh::Mesh(Model* mod, const Mat4& mat, Texture* text)
 {
 	model = mod;
 	modelMatrix = mat;
+	texture = text;
 
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -52,9 +53,9 @@ void Mesh::Update(const Mat4& projviewMatrix, unsigned int shaderProgram)
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *transformMatrix.tab);
 
 	// draw our first triangle
-	
+	glBindTextureUnit(0, texture->texture);
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0); // set it manually
-	glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1); // set it manually
+	//glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1); // set it manually
 
 	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 

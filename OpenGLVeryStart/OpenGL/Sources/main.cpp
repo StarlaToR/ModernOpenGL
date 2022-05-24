@@ -2,14 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <STB_Image/stb_image.h>
-
 #include <iostream>
 #include <App.h>
 #include <Log.h>
 #include <Shader.h>
 #include <Camera.h>
+#include <Texture.h>
 
 using namespace Core;
 using namespace Debug;
@@ -64,8 +62,8 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1200;
 
 int main()
 {
@@ -76,6 +74,9 @@ int main()
 
 	ResourceManager manager;
 	Model* model = manager.Create<Model>("Resources/Obj/cube.obj", "cube");
+	Model* model2 = manager.Create<Model>("Resources/Obj/khazix.obj", "khazix");
+	Model* model3 = manager.Create<Model>("Resources/Obj/Garen.obj", "garen");
+	Model* model4 = manager.Create<Model>("Resources/Obj/Azir.obj", "azir");
 
 	if (model == nullptr)
 	{
@@ -87,41 +88,37 @@ int main()
 	
 	Shader shader("Resources/Shaders/VertexShader.glsl", "Resources/Shaders/FragmentShader.glsl");
 
+	Texture texture("sample.png");
+	Texture texture2("khaz.png");
+	Texture texture3("Azir.png");
+
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	app.lights.push_back(new PointLight(Vec3(0, 10, 10), Vec3(0, 0, 0.3f), Vec3(0, 0.7f, 0), Vec3(1, 0, 0)));
-	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, 0, 1), Vec3(), Vec3(1, 1, 1))));
-	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, 0, -1), Vec3(), Vec3(2, 1, 1))));
+	app.directLights.push_back(new DirectionnalLight(Vec3(5, -10, 0), Vec3(1, 1, 1)));
+	app.pointLights.push_back(new PointLight(Vec3(0,10,0), Vec3(1,1,1), 1, 0.022f, 0.0019f));
+	app.spotLights.push_back(new SpotLight(Vec3(0, -10, 0), Vec3(0, 0, 0), Vec3(1,1,1), 1, 0.022f, 0.0019f, M_PI/3.15));
+
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, 0, 0), Vec3(), Vec3(0.05f, 0.05f, 0.05f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, -3, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, 3, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(3, -3, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(-3, -3, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, -3, 3), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, -3, -3), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, -8, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(0, -20, 0), Vec3(), Vec3(1.f, 1.f, 1.f)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(10, 5, -4), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(-7, -2, 5), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(2, -5, 0), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(-6, -8, -3), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(12, 3, 8), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(3, -9, -5), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(-1, 4, 1), Vec3(), Vec3(1, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model, CreateTransformMatrix(Vec3(20, 10, -1), Vec3(), Vec3(2, 1, 1)), &texture));
+	app.meshes.push_back(new Mesh(model2, CreateTransformMatrix(Vec3(20, 10, -1), Vec3(), Vec3(0.05f, 0.05f, 0.05f)), &texture2));
+	app.meshes.push_back(new Mesh(model3, CreateTransformMatrix(Vec3(0, 10, -1), Vec3(), Vec3(0.05f, 0.05f, 0.05f)), &texture));
+	app.meshes.push_back(new Mesh(model4, CreateTransformMatrix(Vec3(-20, 10, -1), Vec3(), Vec3(0.05f, 0.05f, 0.05f)), &texture3));
 	
-
-	// generate the texture data
-	// ------------------------------------
-	int width, height, nrChannels;
-
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load("sample.png", &width, &height, &nrChannels, 0);
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-	stbi_image_free(data);
-
-	data = stbi_load("sample2.png", &width, &height, &nrChannels, 0);
-
-	GLuint texture2;
-
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-	stbi_image_free(data);
-
 
 	// create a sampler and parameterize it
 	// ------------------------------------
@@ -136,13 +133,13 @@ int main()
 	GLint max = 0;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max);
 
-
-	glBindTextureUnit(0, texture);
+	
+	glBindTextureUnit(0, texture.texture);
 	glBindSampler(0, sampler);
 
-	glBindTextureUnit(1, texture2);
+	glBindTextureUnit(1, texture2.texture);
 	glBindSampler(1, sampler);
-
+	
 
 	// render loop
 	// -----------
@@ -169,7 +166,7 @@ int main()
 	// ------------------------------------------------------------------------
 	app.meshes.clear();
 
-	glDeleteTextures(1, &texture);
+	glDeleteTextures(1, &texture.texture);
 
 	glDeleteSamplers(1, &sampler);
 

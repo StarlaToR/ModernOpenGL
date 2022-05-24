@@ -57,7 +57,7 @@ void App::Init(AppInitializer initializer)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void App::Update(int shaderProgram)
+void App::Update(unsigned int shaderProgram)
 {
 	// input
 		// -----
@@ -74,12 +74,13 @@ void App::Update(int shaderProgram)
 	cam.Update();
 	Mat4 projView = cam.GetProjectionMatrix() * cam.GetViewMatrix();
 	
-	glUniform3f(glGetUniformLocation(shaderProgram, "ambientColor"), lights[0]->ambientColor.x, lights[0]->ambientColor.y, lights[0]->ambientColor.z);
-	glUniform3f(glGetUniformLocation(shaderProgram, "diffuseColor"), lights[0]->diffuseColor.x, lights[0]->diffuseColor.y, lights[0]->diffuseColor.z);
-	glUniform3f(glGetUniformLocation(shaderProgram, "specularColor"), lights[0]->specularColor.x, lights[0]->specularColor.y, lights[0]->specularColor.z);
-	glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lights[0]->position.x, lights[0]->position.y, lights[0]->position.z);
-	//glUniform1i(glGetUniformLocation(shaderProgram, "lightType"), lights[0]->type);
-	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), cam.position.x, cam.position.y, cam.position.z);
+	glUseProgram(shaderProgram);
+	
+	ASSERT(directLights.size() + pointLights.size() + spotLights.size() > 8, "There are too many lights in the scene");
+
+	PointLightsToShaders(shaderProgram);
+	DirectLightsToShaders(shaderProgram);
+	SpotLightsToShaders(shaderProgram);
 
 	for (int i = 0; i < meshes.size(); i++)
 	{
@@ -90,6 +91,131 @@ void App::Update(int shaderProgram)
 	// -------------------------------------------------------------------------------
 	glfwSwapBuffers(window);
 }
+
+void App::PointLightsToShaders(unsigned int shaderProgram)
+{
+	stringstream diffuseColor;
+	stringstream ambientColor;
+	stringstream specularColor;
+	stringstream constant;
+	stringstream linear;
+	stringstream quadratic;
+	stringstream lightPos;
+
+	for (int i = 0; i < pointLights.size(); i++)
+	{
+		diffuseColor << "pointLights[" << i << "].diffuseColor";
+		ambientColor << "pointLights[" << i << "].ambientColor";
+		specularColor << "pointLights[" << i << "].specularColor";
+
+		constant << "pointLights[" << i << "].constant";
+		linear << "pointLights[" << i << "].linear";
+		quadratic << "pointLights[" << i << "].quadratic";
+
+		lightPos << "pointLights[" << i << "].position";
+
+		glUniform3f(glGetUniformLocation(shaderProgram, diffuseColor.str().c_str()), pointLights[i]->diffuseColor.x, pointLights[i]->diffuseColor.y, pointLights[i]->diffuseColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, ambientColor.str().c_str()), pointLights[i]->ambientColor.x, pointLights[i]->ambientColor.y, pointLights[i]->ambientColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, specularColor.str().c_str()), pointLights[i]->specularColor.x, pointLights[i]->specularColor.y, pointLights[i]->specularColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, lightPos.str().c_str()), pointLights[i]->position.x, pointLights[i]->position.y, pointLights[i]->position.z);
+
+		glUniform1f(glGetUniformLocation(shaderProgram, constant.str().c_str()), pointLights[i]->constant);
+		glUniform1f(glGetUniformLocation(shaderProgram, linear.str().c_str()), pointLights[i]->linear);
+		glUniform1f(glGetUniformLocation(shaderProgram, quadratic.str().c_str()), pointLights[i]->quadratic);
+
+		diffuseColor.str("");
+		ambientColor.str("");
+		specularColor.str("");
+		lightPos.str("");
+		constant.str("");
+		linear.str("");
+		quadratic.str("");
+	}
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "pointLightCount"), pointLights.size());
+
+}
+
+void App::DirectLightsToShaders(unsigned int shaderProgram)
+{
+	stringstream diffuseColor;
+	stringstream ambientColor;
+	stringstream specularColor;
+	stringstream lightDir;
+
+	for (int i = 0; i < directLights.size(); i++)
+	{
+		diffuseColor << "directLights[" << i << "].diffuseColor";
+		ambientColor << "directLights[" << i << "].ambientColor";
+		specularColor << "directLights[" << i << "].specularColor";
+		lightDir << "directLights[" << i << "].direction";
+
+		glUniform3f(glGetUniformLocation(shaderProgram, diffuseColor.str().c_str()), directLights[i]->diffuseColor.x, directLights[i]->diffuseColor.y, directLights[i]->diffuseColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, ambientColor.str().c_str()), directLights[i]->ambientColor.x, directLights[i]->ambientColor.y, directLights[i]->ambientColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, specularColor.str().c_str()), directLights[i]->specularColor.x, directLights[i]->specularColor.y, directLights[i]->specularColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, lightDir.str().c_str()), directLights[i]->direction.x, directLights[i]->direction.y, directLights[i]->direction.z);
+
+
+		diffuseColor.str("");
+		ambientColor.str("");
+		specularColor.str("");
+		lightDir.str("");
+	}
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "directLightCount"), directLights.size());
+
+}
+
+void App::SpotLightsToShaders(unsigned int shaderProgram)
+{
+	stringstream diffuseColor;
+	stringstream ambientColor;
+	stringstream specularColor;
+	stringstream constant;
+	stringstream linear;
+	stringstream quadratic;
+	stringstream lightPos;
+	stringstream lightDir;
+	stringstream lightAng;
+
+	for (int i = 0; i < spotLights.size(); i++)
+	{
+		ambientColor << "spotLights[" << i << "].ambientColor";
+		diffuseColor << "spotLights[" << i << "].diffuseColor";
+		specularColor << "spotLights[" << i << "].specularColor";
+		constant << "spotLights[" << i << "].constant";
+		linear << "spotLights[" << i << "].linear";
+		quadratic << "spotLights[" << i << "].quadratic";
+		lightPos << "spotLights[" << i << "].position";
+		lightDir << "spotLights[" << i << "].direction";
+		lightAng << "spotLights[" << i << "].angle";
+
+		glUniform3f(glGetUniformLocation(shaderProgram, diffuseColor.str().c_str()), spotLights[i]->diffuseColor.x, spotLights[i]->diffuseColor.y, spotLights[i]->diffuseColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, ambientColor.str().c_str()), spotLights[i]->ambientColor.x, spotLights[i]->ambientColor.y, spotLights[i]->ambientColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, specularColor.str().c_str()), spotLights[i]->specularColor.x, spotLights[i]->specularColor.y, spotLights[i]->specularColor.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, lightPos.str().c_str()), spotLights[i]->position.x, spotLights[i]->position.y, spotLights[i]->position.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, lightDir.str().c_str()), spotLights[i]->direction.x, spotLights[i]->direction.y, spotLights[i]->direction.z);
+
+		glUniform1f(glGetUniformLocation(shaderProgram, constant.str().c_str()), spotLights[i]->constant);
+		glUniform1f(glGetUniformLocation(shaderProgram, linear.str().c_str()), spotLights[i]->linear);
+		glUniform1f(glGetUniformLocation(shaderProgram, quadratic.str().c_str()), spotLights[i]->quadratic);
+		glUniform1f(glGetUniformLocation(shaderProgram, lightAng.str().c_str()), spotLights[i]->angle);
+
+		diffuseColor.str("");
+		ambientColor.str("");
+		specularColor.str("");
+		lightPos.str("");
+		lightDir.str(""); 
+		constant.str("");
+		linear.str("");
+		quadratic.str("");
+		lightAng.str("");
+		
+	}
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "spotLightCount"), spotLights.size());
+}
+
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
