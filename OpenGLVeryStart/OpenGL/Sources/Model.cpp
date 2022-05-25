@@ -11,7 +11,7 @@ void Model::loadResource()
 
 	ASSERT(file.is_open(), "Can't open file");
 
-    log.Print("%s is open\n", resourcePath);
+    //log.Print("%s is open\n", resourcePath);
 
     vector<unsigned int> vertexIndices, normalIndices, uvIndices;
 
@@ -94,7 +94,7 @@ void Model::loadResource()
         //cout << i << endl;
     }
 
-    log.Print("%s is loaded\n", resourcePath);
+    //log.Print("%s is loaded\n", resourcePath);
     //printResource();
     file.close();
 }

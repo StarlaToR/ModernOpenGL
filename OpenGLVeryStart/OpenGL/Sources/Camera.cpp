@@ -71,6 +71,7 @@ void Camera::MouseDirection(double xpos, double ypos)
 		sin(DegToRad(yaw))* cos(DegToRad(pitch)),
 		};
 	camForward = dir.GetNormalizedVector();
+	oldDirection = camForward;
 }
 
 /*

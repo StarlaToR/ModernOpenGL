@@ -2,11 +2,17 @@
 
 using namespace LowRenderer;
 
-Mesh::Mesh(Model* mod, const Mat4& mat, Texture* text)
+Mesh::Mesh(Model* mod, const Vec3& pos, const Vec3& rot, const Vec3& sca, Texture* text)
 {
 	model = mod;
-	modelMatrix = mat;
+	positionVec = pos;
+	rotationVec = rot;
+	scaleVec = sca;
 	texture = text;
+
+	position = new float[3]{pos.x, pos.y, pos.z };
+	rotation = new float[3]{ rot.x, rot.y, rot.z };
+	scale = new float[3]{ sca.x, sca.y, sca.z };
 
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -43,6 +49,7 @@ Mesh::~Mesh()
 
 void Mesh::Update(const Mat4& projviewMatrix, unsigned int shaderProgram)
 {
+	Mat4 modelMatrix = GetModelMatrix();
 	Mat4 transformMatrix = projviewMatrix * modelMatrix;
 
 	glUseProgram(shaderProgram);
@@ -50,7 +57,7 @@ void Mesh::Update(const Mat4& projviewMatrix, unsigned int shaderProgram)
 	unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, *modelMatrix.tab);
 	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *transformMatrix.tab);
+ 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, *transformMatrix.tab);
 
 	// draw our first triangle
 	glBindTextureUnit(0, texture->texture);
@@ -60,4 +67,24 @@ void Mesh::Update(const Mat4& projviewMatrix, unsigned int shaderProgram)
 	glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
 	glDrawElements(GL_TRIANGLES, model->vertices.size(), GL_UNSIGNED_INT, 0);
+}
+
+Mat4 Mesh::GetModelMatrix()
+{
+	return CreateTransformMatrix(positionVec, rotationVec, scaleVec);
+}
+
+void Mesh::SetPosition(Vec3 pos)
+{
+	positionVec = pos;
+}
+
+void Mesh::SetRotation(Vec3 rot)
+{
+	rotationVec = rot;
+}
+
+void Mesh::SetScale(Vec3 sca)
+{
+	scaleVec = sca;
 }

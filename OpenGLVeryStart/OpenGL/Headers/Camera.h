@@ -25,11 +25,11 @@ namespace LowRenderer
 		0.f, 0.f, -1.f, 0.f,
 		};	
 
-		bool firstMouse = true;
 		float lastX = 400.f, lastY = 300.f, yaw = -90, pitch = 0;
 
 	public:
-		Vec3 direction = Vec3(0,0,0);
+		Vec3 direction = Vec3();
+		Vec3 oldDirection = Vec3(0, 0, -1);
 		Vec3 target = Vec3();
 		Vec3 position = Vec3(0, 0, -9);
 		Vec3 rotation;
@@ -39,6 +39,7 @@ namespace LowRenderer
 		float speed = 0.05f;
 		float deltaTime = 0.0f;
 		float lastFrame = 0.0f;
+		bool firstMouse = true;
 
 		Camera() {}
 		~Camera() {}

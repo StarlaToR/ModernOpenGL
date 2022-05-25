@@ -15,6 +15,7 @@ namespace Resources
 	public:
 		GLuint texture;
 
+		Texture() {};
 		Texture(const std::string& filename)
 		{
 			setResourcePath(filename);

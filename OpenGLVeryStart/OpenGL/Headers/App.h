@@ -1,5 +1,9 @@
 #pragma once
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -28,10 +32,12 @@ namespace Core
 	class App
 	{
 	private:
-		
+		bool mouseOn = true;
+		bool drawOn = true;
 	public:
 		GLFWwindow* window;
 		LowRenderer::Camera cam;
+		ResourceManager* manager;
 		std::vector<LowRenderer::Mesh*> meshes;
 		std::vector<LowRenderer::PointLight*> pointLights;
 		std::vector<LowRenderer::DirectionnalLight*> directLights;
